@@ -12,14 +12,20 @@ require_once 'HotDate/HotDateTimeZone.php';
 class HotDateTime implements Serializable
 {
 	protected $dateTime = null;
+	protected $timeZone = null;
 
-	public function __construct($time = 'now', DateTimeZone $timezone = null)
+	public function __construct($time = 'now', DateTimeZone $timeZone = null)
 	{
-		if ($timezone === null) {
-			$this->dateTime = new DateTime($time);
-		} else {
-			$this->dateTime = new DateTime($time, $timezone);
+		if ($timeZone === null) {
+			$timeZone = new HotDateTimeZone(date_default_timezone_get());
 		}
+
+		if (!($timeZone instanceof HotDateTimeZone)) {
+			$timeZone = new HotDateTimeZone($timeZone->getName());
+		}
+
+		$this->dateTime = new DateTime($time, $timeZone);
+		$this->timeZone = $timeZone;
 	}
 
 	public function add(HotDateInterval $interval)
@@ -103,7 +109,7 @@ class HotDateTime implements Serializable
 
 	public function getTimezone()
 	{
-		return $this->dateTime->getTimezone();
+		return $this->timeZone;
 	}
 
 	public function modify($modify)
@@ -165,9 +171,16 @@ class HotDateTime implements Serializable
 
 	public function setTimezone(DateTimeZone $timezone)
 	{
-		if ($this->dateTime->setTimezone($timezone) === false) {
+		if (!($timeZone instanceof HotDateTimeZone)) {
+			$timeZone = new HotDateTimeZone($timeZone->getName());
+		}
+
+		if ($this->dateTime->setTimezone($timeZone) === false) {
 			return false;
 		}
+
+		$this->timeZone = $timeZone;
+
 		return $this;
 	}
 
@@ -188,7 +201,7 @@ class HotDateTime implements Serializable
 	{
 		$data = array(
 			$this->dateTime->format('U'),
-			$this->dateTime->getTimezone()->getName(),
+			$this->timeZone->getName(),
 		);
 
 		return serialize($data);
@@ -197,10 +210,14 @@ class HotDateTime implements Serializable
 	public function unserialize($serialized)
 	{
 		$data = unserialize($serialized);
-		$this->dateTime = new DateTime(
-			'@' . $data[0],
-			new HotDateTimeZone($data[1])
-		);
+
+		$this->timeZone = new HotDateTimeZone($data[1]);
+		$this->dateTime = new DateTime('@' . $data[0], $this->timeZone);
+	}
+
+	public function __clone()
+	{
+		$this->timeZone = clone $this->timeZone;
 	}
 
 }
