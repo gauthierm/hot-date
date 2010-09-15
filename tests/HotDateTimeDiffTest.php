@@ -99,6 +99,38 @@ class HotDateTimeDiffTest extends PHPUnit_Framework_TestCase
 			'number of seconds or incorrect interval.'
 		);
 	}
+
+	public function testZero()
+	{
+		$date1 = new HotDateTime('2010-01-01T00:00:00');
+		$date2 = new HotDateTime('2010-01-01T00:00:00');
+
+		$expectedInterval = new HotDateInterval('P');
+		$expectedInterval->days = 0;
+		$expectedInterval->invert = false;
+		$interval = $date1->diff($date2);
+		$this->assertEquals(
+			$expectedInterval,
+			$interval,
+			'Subtracting equivalent dates doesn\'t result in zero interval.'
+		);
+	}
+
+	public function testWrap()
+	{
+		$date1 = new HotDateTime('2010-01-01T00:00:00');
+		$date2 = new HotDateTime('2009-01-01T00:00:01');
+
+		$expectedInterval = new HotDateInterval('P11M30DT23H59M59S');
+		$expectedInterval->days = 364;
+		$expectedInterval->invert = true;
+		$interval = $date1->diff($date2);
+		$this->assertEquals(
+			$expectedInterval,
+			$interval,
+			'Subtracting equivalent dates doesn\'t result in zero interval.'
+		);
+	}
 }
 
 ?>
