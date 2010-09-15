@@ -75,7 +75,11 @@ class HotDateTime implements Serializable
 
 		$modify = trim($modify);
 
-		return $this->modify($modify);
+		if ($modify) {
+			return $this->modify($modify);
+		}
+
+		return $this;
 	}
 
 	public function diff(HotDateTime $datetime2, $absolute = false)
@@ -83,25 +87,65 @@ class HotDateTime implements Serializable
 		$seconds1 = $this->getTimestamp();
 		$seconds2 = $datetime2->getTimestamp();
 
-		$diff = abs($seconds1 - $seconds2);
+		// The following calculations assume a lesser date is being subtracted
+		// from a greater date. Set variables appropriately.
+		if ($seconds1 > $seconds2) {
+			$end   = clone $this;
+			$start = clone $datetime2;
+		} else {
+			$end   = clone $datetime2;
+			$start = clone $this;
+		}
 
-		// seconds, PHP 5.3 doesn't know about leap-seconds either
-		$s = $diff % 60;
-		$diff = ($diff - $s) / 60;
+		// Convert to UTC so time zones will be considered. Note: PHP 5.3
+		// does not do this correctly. See http://bugs.php.net/bug.php?id=52480
+		$start->setTimezone(new HotDateTimeZone('UTC'));
+		$end->setTimezone(new HotDateTimeZone('UTC'));
 
-		// minutes
-		$i = $diff % 60;
-		$diff = ($diff - $i) / 60;
+		// Calculate seconds, minutes and hours.
+		$end->sub(
+			new HotDateInterval(
+				  'PT' . $start->format('H\Hi\Ms\S')
+			)
+		);
 
-		// hours, time zones don't matter since we're using timestamps in UTC
-		$h = $diff % 24;
-		$diff = ($diff - $h) / 24;
+		// Can't use HotDateTime::sub() here because it will always wrap
+		// months and years to the previous month/year even if the days and
+		// months should evaluate to 0.
 
 		// days
-		$days = $diff;
+		if ($start->format('j') === $end->format('j')) {
+			$days = 0;
+		} else {
+			$end->sub(new HotDateInterval('P' . $start->format('j\D')));
+			$days = (integer)$end->format('j');
+		}
 
-		$period = 'P' . 'T' . $h . 'H' . $i . 'M' . $s . 'S';
-		$interval = new HotDateInterval($period);
+		// months
+		if ($start->format('n') === $end->format('n')) {
+			$months = 0;
+		} else {
+			$end->sub(new HotDateInterval('P' . $start->format('n\M')));
+			$months = (integer)$end->format('n');
+		}
+
+		// years
+		$end->sub(new HotDateInterval('P' . $start->format('Y\Y')));
+		$years = (integer)$end->format('Y');
+
+		// Calculate days. This doesn't account for leap-seconds, but PHP 5.3
+		// doesn't either.
+		$diff = abs($seconds1 - $seconds2);
+		$days = (integer)floor($diff / 86400);
+
+		// Create interval result object
+		$interval = new HotDateInterval(
+			  str_pad($years, 4, '0', STR_PAD_LEFT)
+			. str_pad($months, 2, '0', STR_PAD_LEFT)
+			. str_pad($days, 2, '0', STR_PAD_LEFT)
+			. 'T' . $end->format('His')
+		);
+
 		$interval->days = $days;
 
 		if ($seconds1 > $seconds2 && !$absolute) {
@@ -188,7 +232,7 @@ class HotDateTime implements Serializable
 		return $this;
 	}
 
-	public function setTimezone(DateTimeZone $timezone)
+	public function setTimezone(DateTimeZone $timeZone)
 	{
 		if (!($timeZone instanceof HotDateTimeZone)) {
 			$timeZone = new HotDateTimeZone($timeZone->getName());
@@ -239,9 +283,9 @@ class HotDateTime implements Serializable
 
 	public function __clone()
 	{
+		$this->dateTime = clone $this->dateTime;
 		$this->timeZone = clone $this->timeZone;
 	}
-
 }
 
 ?>
