@@ -11,9 +11,9 @@ class HotDateInterval
 	public $invert = false;
 	public $days = false;
 
-	public function __construct($interval_spec)
+	public function __construct($intervalSpec)
 	{
-		$result = self::parseIntervalSpec($interval_spec);
+		$result = self::parseIntervalSpec($intervalSpec);
 		foreach ($result as $key => $value) {
 			if (property_exists($this, strtolower($key))) {
 				$this->{strtolower($key)} = $value;

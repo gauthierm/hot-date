@@ -78,14 +78,33 @@ class HotDateTime implements Serializable
 		return $this->modify($modify);
 	}
 
-	public function diff(DateTime $datetime2, $absolute = false)
+	public function diff(HotDateTime $datetime2, $absolute = false)
 	{
-		$interval = new HotDateInterval();
-
 		$seconds1 = $this->getTimestamp();
 		$seconds2 = $datetime2->getTimestamp();
 
-		if ($seconds1 < $seconds2 && $absolute) {
+		$diff = abs($seconds1 - $seconds2);
+
+		// seconds, PHP 5.3 doesn't know about leap-seconds either
+		$s = $diff % 60;
+		$diff = ($diff - $s) / 60;
+
+		// minutes
+		$i = $diff % 60;
+		$diff = ($diff - $i) / 60;
+
+		// hours, time zones don't matter since we're using timestamps in UTC
+		$h = $diff % 24;
+		$diff = ($diff - $h) / 24;
+
+		// days
+		$days = $diff;
+
+		$period = 'P' . 'T' . $h . 'H' . $i . 'M' . $s . 'S';
+		$interval = new HotDateInterval($period);
+		$interval->days = $days;
+
+		if ($seconds1 > $seconds2 && !$absolute) {
 			$interval->invert = true;
 		}
 
@@ -213,6 +232,9 @@ class HotDateTime implements Serializable
 
 		$this->timeZone = new HotDateTimeZone($data[1]);
 		$this->dateTime = new DateTime('@' . $data[0], $this->timeZone);
+
+		// DateTime constructor with timestamp is always UTC
+		$this->dateTime->setTimezone($this->timeZone);
 	}
 
 	public function __clone()
