@@ -6,7 +6,8 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
 
 require_once 'PHPUnit/TextUI/TestRunner.php';
 
-require_once 'HotDateTimeDiffTest.php';
+require_once 'HotDateTime_Diff.php';
+require_once 'HotDateTime_TimeZone.php';
 
 class HotDate_AllTests
 {
@@ -23,7 +24,8 @@ class HotDate_AllTests
     public static function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite('HotDate Tests');
-        $suite->addTestSuite('HotDateTimeDiffTest');
+        $suite->addTestSuite('HotDateTime_Diff');
+        $suite->addTestSuite('HotDateTime_TimeZone');
         return $suite;
     }
 

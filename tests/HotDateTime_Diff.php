@@ -4,12 +4,13 @@ require_once 'PHPUnit/Framework/TestCase.php';
 require_once 'HotDate/HotDateTime.php';
 require_once 'HotDate/HotDateInterval.php';
 
-class HotDateTimeDiffTest extends PHPUnit_Framework_TestCase
+class HotDateTime_Diff extends PHPUnit_Framework_TestCase
 {
 	public function setUp()
 	{
 		date_default_timezone_set('UTC');
 	}
+
 	public function testInvert()
 	{
 		$date1 = new HotDateTime('2010-01-01T00:00:00');
