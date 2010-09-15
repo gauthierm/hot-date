@@ -136,7 +136,7 @@ class HotDateTime implements Serializable
 		// Calculate days. This doesn't account for leap-seconds, but PHP 5.3
 		// doesn't either.
 		$diff = abs($seconds1 - $seconds2);
-		$days = (integer)floor($diff / 86400);
+		$totalDays = (integer)floor($diff / 86400);
 
 		// Create interval result object
 		$interval = new HotDateInterval(
@@ -146,7 +146,7 @@ class HotDateTime implements Serializable
 			. 'T' . $end->format('His')
 		);
 
-		$interval->days = $days;
+		$interval->days = $totalDays;
 
 		if ($seconds1 > $seconds2 && !$absolute) {
 			$interval->invert = true;
