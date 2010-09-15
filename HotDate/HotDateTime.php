@@ -442,6 +442,21 @@ class HotDateTime implements Serializable
 			$second
 		);
 	}
+
+	public function before(HotDateTime $when)
+	{
+		return (self::compare($this, $when) == -1);
+	}
+
+	public function after(HotDateTime $when)
+	{
+		return (self::compare($this, $when) == 1);
+	}
+
+	public function equals(HotDateTime $when)
+	{
+		return (self::compare($this, $when) == 0);
+	}
 }
 
 ?>
