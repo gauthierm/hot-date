@@ -18,6 +18,12 @@ echo $date2->format('c'), "\n";
 echo $date3->format('c'), "\n";
 echo $date4->format('c'), "\n";
 
-echo unserialize(serialize($date4));
+echo "\n";
+echo unserialize(serialize($date4)), "\n";
+echo "\n";
 
-//$date2 = new HotDateTime('20080501T184212');
+$date5 = new HotDateTime('20031101T184212');
+echo $date1, "\n";
+echo $date5, "\n";
+$interval = $date1->diff($date5);
+var_dump($interval);
