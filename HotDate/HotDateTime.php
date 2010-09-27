@@ -209,7 +209,8 @@ class HotDateTime implements Serializable
 
 	public function setTimestamp($unixtimestamp)
 	{
-		$date = new HotDateTime('@' . $unixtimestamp, $this->getTimezone());
+		$date = new HotDateTime('@' . $unixtimestamp);
+		$date->setTimezone($this->getTimezone());
 
 		$result = $this->dateTime->setDate(
 			$date->format('Y'),
@@ -232,10 +233,19 @@ class HotDateTime implements Serializable
 		return $this;
 	}
 
-	public function setTimezone(DateTimeZone $timeZone)
+	public function setTimezone($timeZone)
 	{
 		if (!($timeZone instanceof HotDateTimeZone)) {
-			$timeZone = new HotDateTimeZone($timeZone->getName());
+			if ($timeZone instanceof DateTimeZone) {
+				$timeZone = new HotDateTimeZone($timeZone->getName());
+			} elseif (is_string($timeZone)) {
+				$timeZone = new HotDateTimeZone($timeZone);
+			}
+		}
+
+		if (!($timeZone instanceof HotDateTimeZone)) {
+			throw new InvalidArgumentException('Specified $timeZone is '
+			. 'neither a string not a DateTimeZone object.');
 		}
 
 		if ($this->dateTime->setTimezone($timeZone) === false) {
