@@ -71,9 +71,8 @@ class HotDateTimeZone extends DateTimeZone
 		if ($what === HotDateTimeZone::PER_COUNTRY) {
 			// unsupported
 		} else {
-			if (isset(self::$identifiersByWhat[$what])) {
-				$identifiers = self::$identifiersByWhat[$what];
-			} else {
+			if (!isset(self::$identifiersByWhat[$what])) {
+
 				// build requested regions array
 				$regions = array();
 				foreach (self::$zoneMap as $key => $zone) {
@@ -90,11 +89,11 @@ class HotDateTimeZone extends DateTimeZone
 						self::$identifiersByWhat[$what][] = $identifier;
 					}
 				}
-				$identifiers = self::$identifiersByWhat[$what];
+
 			}
 		}
 
-		return $identifiers;
+		return self::$identifiersByWhat[$what];
 	}
 }
 
