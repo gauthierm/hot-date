@@ -97,6 +97,8 @@ class HotDateInterval
 				$output .= $format[$i];
 			}
 		}
+
+		return $output;
 	}
 
 	protected static function parseIntervalSpec($spec)
