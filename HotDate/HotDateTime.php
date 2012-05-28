@@ -84,8 +84,8 @@ class HotDateTime implements Serializable
 
 	public function diff(HotDateTime $datetime2, $absolute = false)
 	{
-		$seconds1 = $this->getTimestamp();
-		$seconds2 = $datetime2->getTimestamp();
+		$seconds1 = (float)$this->dateTime->format('U');
+		$seconds2 = (float)$datetime2->dateTime->format('U');
 
 		// The following calculations assume a lesser date is being subtracted
 		// from a greater date. Set variables appropriately.
@@ -135,7 +135,7 @@ class HotDateTime implements Serializable
 
 		// Calculate days. This doesn't account for leap-seconds, but PHP 5.3
 		// doesn't either.
-		$diff = abs($seconds1 - $seconds2);
+		$diff = (integer)abs($seconds1 - $seconds2);
 		$totalDays = (integer)floor($diff / 86400);
 
 		// Create interval result object
@@ -167,7 +167,19 @@ class HotDateTime implements Serializable
 
 	public function getTimestamp()
 	{
-		return (integer)$this->dateTime->format('U');
+		$timestamp = (float)$this->dateTime->format('U');
+
+		if ($timestamp < 0) {
+			// clamp to 32-bit signed positive integer range like DateTime does.
+			$timestamp = false;
+		} elseif ($timestamp > 2147483647) {
+			// clamp to 32-bit signed positive integer range like DateTime does.
+			$timestamp = false;
+		} else {
+			$timestamp = (integer)$timestamp;
+		}
+
+		return $timestamp;
 	}
 
 	public function getTimezone()
