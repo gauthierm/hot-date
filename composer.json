@@ -1,0 +1,20 @@
+{
+	"name": "silverorange/hotdate",
+	"description": "PHP 5.3 DateTime compatibility layer.",
+	"type": "library",
+	"keywords": [ "date" ],
+	"homepage": "https://code.silverorange.com/",
+	"license": "LGPL-2.1",
+	"authors": [
+		{
+			"name": "Michael Gauthier",
+			"email": "mike@silverorange.com"
+		}
+	],
+	"require"     : {
+		"php": ">=5.2.0"
+	},
+	"autoload": {
+		"classmap": [ "HotDate" ]
+	}
+}
