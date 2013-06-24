@@ -2,7 +2,7 @@
 
 require_once 'PEAR/PackageFileManager2.php';
 
-$version = '0.1.5';
+$version = '0.2.0';
 $notes = <<<EOT
 see ChangeLog
 EOT;
@@ -38,7 +38,7 @@ $package->setLicense('private', 'http://www.silverorange.com/');
 
 $package->setReleaseVersion($version);
 $package->setReleaseStability('alpha');
-$package->setAPIVersion('0.1.1');
+$package->setAPIVersion('0.2.0');
 $package->setAPIStability('alpha');
 $package->setNotes($notes);
 
@@ -46,7 +46,7 @@ $package->addIgnore('package.php');
 
 $package->addMaintainer('lead', 'gauthierm', 'Mike Gauthier', 'mike@silverorange.com');
 
-$package->setPhpDep('5.2.0');
+$package->setPhpDep('5.3.0');
 $package->setPearinstallerDep('1.4.0');
 $package->generateContents();
 
