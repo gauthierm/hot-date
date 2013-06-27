@@ -9,8 +9,8 @@ class HotDateTime extends DateTime implements Serializable
 	public function serialize()
 	{
 		$data = array(
-			$this->dateTime->getTimestamp(),
-			$this->timeZone->getName(),
+			$this->getTimestamp(),
+			$this->getTimeZone()->getName(),
 		);
 
 		return serialize($data);
@@ -20,11 +20,11 @@ class HotDateTime extends DateTime implements Serializable
 	{
 		$data = unserialize($serialized);
 
-		$this->timeZone = new DateTimeZone($data[1]);
-		$this->dateTime = new DateTime('@' . $data[0]);
+		$timeZone = new DateTimeZone($data[1]);
+		$this->setTimestamp($data[0]);
 
 		// DateTime constructor with timestamp is always UTC
-		$this->dateTime->setTimezone($this->timeZone);
+		$this->setTimezone($timeZone);
 	}
 }
 
